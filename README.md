@@ -12,3 +12,6 @@ It does it in the following way:
 5. Use another passthrough filter to remove along y direction after rotation.
 6. Cluster the cloud to isolate remaning objects and only allow those of sizes similar to  the objects.
 7. Publish the most likely cluster (Might have to improve).
+
+The output cluster is published to /s8/detectedObjects, the point cloud is of type
+pcl::PointXYZRGB
