@@ -274,7 +274,7 @@ private:
 			double yDiff = max_point_AABB.y - min_point_AABB.y;
 			double zDiff = max_point_AABB.z - min_point_AABB.z;
 			// Force the cluster to be roughly the shape of the object.
-			if (xDiff > 0.02 && xDiff < 0.06 && yDiff > 0.02 && yDiff < 0.06 && zDiff < 0.04)
+			if (xDiff > 0.01 && xDiff < 0.10 && yDiff > 0.01 && yDiff < 0.10 && zDiff < 0.10)
 			{
 				cout << "x: " << mass_center(0) << " y: " << mass_center(1) << " z: " << mass_center(2) << endl;
 				cloudPublish(cloud_cluster);
@@ -331,4 +331,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
