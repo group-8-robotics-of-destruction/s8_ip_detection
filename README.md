@@ -15,5 +15,3 @@ It does it in the following way:
 
 The output cluster is published to /s8/detectedObjects, the point cloud is of type
 pcl::PointXYZRGB
-t
-sdf
