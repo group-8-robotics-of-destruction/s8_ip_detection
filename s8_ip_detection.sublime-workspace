@@ -1,0 +1,921 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"z",
+				"zDiff"
+			],
+			[
+				"max",
+				"max_point_AABB"
+			],
+			[
+				"ma",
+				"max_point_AABB"
+			],
+			[
+				"min",
+				"min_point_AABB"
+			],
+			[
+				"cl",
+				"cloudPublish"
+			],
+			[
+				"cluste",
+				"clusterCloud"
+			],
+			[
+				"Point",
+				"PointT"
+			],
+			[
+				"Po",
+				"PointT"
+			],
+			[
+				"point",
+				"pointT"
+			],
+			[
+				"poi",
+				"PointT"
+			],
+			[
+				"PARAM_C",
+				"PARAM_CAM_ANGLE_DEFAULT"
+			],
+			[
+				"cam",
+				"cam_angle"
+			],
+			[
+				"fil",
+				"filter_x"
+			],
+			[
+				"re",
+				"removeWallsCloud"
+			],
+			[
+				"get",
+				"getMoments"
+			],
+			[
+				"coeff",
+				"coefficients"
+			],
+			[
+				"cou",
+				"cloudInitialized"
+			],
+			[
+				"cloud",
+				"cloudInitialized"
+			],
+			[
+				"clo",
+				"cloudInitialized"
+			],
+			[
+				"pass",
+				"passthroughFilterCloud"
+			],
+			[
+				"PARAM_FL",
+				"PARAM_FLOOR_EXTRACTION_DIST_DEFAULT"
+			],
+			[
+				"floo",
+				"floor_extraction_dist"
+			],
+			[
+				"flo",
+				"floor_extraction_dist"
+			],
+			[
+				"extra",
+				"extractFloor"
+			],
+			[
+				"cloud_",
+				"cloud_floor"
+			],
+			[
+				"y",
+				"yDist"
+			],
+			[
+				"find",
+				"findClosestDist"
+			],
+			[
+				"ori",
+				"orientation3"
+			],
+			[
+				"orie",
+				"orientation2"
+			],
+			[
+				"tra",
+				"transformed_cloud"
+			],
+			[
+				"rota",
+				"rotatePointCloud"
+			],
+			[
+				"in",
+				"inputCloud"
+			],
+			[
+				"P",
+				"PointXYZ"
+			],
+			[
+				"clou",
+				"cloud_projected1"
+			],
+			[
+				"view",
+				"viewer_model"
+			],
+			[
+				"add",
+				"addPointCloud"
+			],
+			[
+				"ve",
+				"viewer_model"
+			],
+			[
+				"R",
+				"RangeImage"
+			],
+			[
+				"range",
+				"rangeImage"
+			],
+			[
+				"cyl_ra",
+				"cyl_rad_min"
+			],
+			[
+				"PARAM_CYL_R",
+				"PARAM_CYL_RAD_MIN_DEFAULT"
+			],
+			[
+				"PARAM_CYL_NO",
+				"PARAM_CYL_NORMAL_DISTANCE_NAME"
+			],
+			[
+				"cyl_",
+				"cyl_min_size"
+			],
+			[
+				"cyl",
+				"cloudCylinder"
+			],
+			[
+				"inlier",
+				"inlierSizeCylinder"
+			],
+			[
+				"inier",
+				"inlierSize"
+			],
+			[
+				"le",
+				"voxel_leaf_size"
+			],
+			[
+				"PARAM_VO",
+				"PARAM_VOXEL_LEAF_SIZE_DEFAULT"
+			],
+			[
+				"vo",
+				"voxel_leaf_size"
+			],
+			[
+				"PARAM_V",
+				"PARAM_VOXEL_LEAF_SIZE_NAME"
+			],
+			[
+				"PARAM_OBJ_I",
+				"PARAM_OBJ_ITEM_PERCENTAGE_NAME"
+			],
+			[
+				"obj_min",
+				"obj_min_size"
+			],
+			[
+				"obj",
+				"obj_item_percentage"
+			],
+			[
+				"obj_m",
+				"obj_min_size"
+			],
+			[
+				"inli",
+				"inlierSize"
+			],
+			[
+				"inlie",
+				"inliers"
+			],
+			[
+				"std",
+				"std_kmean"
+			],
+			[
+				"stat",
+				"StatisticalOutlierRemoval"
+			],
+			[
+				"statisticalOutlier",
+				"statistical_outlier_removal"
+			],
+			[
+				"PARAM_ST",
+				"PARAM_STAT_STDDIST_DEFAULT"
+			],
+			[
+				"remove",
+				"removeObjectOutlier"
+			],
+			[
+				"angle",
+				"angleRad"
+			],
+			[
+				"inc",
+				"include"
+			],
+			[
+				"PARAM_OB",
+				"PARAM_OBJ_MIN_DEFAULT"
+			],
+			[
+				"PARAM_OBJ",
+				"PARAM_OBJ_MIN_DEFAULT"
+			],
+			[
+				"PARAM_O",
+				"PARAM_OBJ_DISTANCE_NAME"
+			],
+			[
+				"CLOUD",
+				"cloud_obj"
+			],
+			[
+				"coef",
+				"coeffMatrix"
+			],
+			[
+				"coe",
+				"coeffMatrix"
+			],
+			[
+				"seg",
+				"seg_percentage"
+			],
+			[
+				"seg_",
+				"seg_distance"
+			],
+			[
+				"PARAM_SE",
+				"PARAM_SEG_DISTANCE_DEFAULT"
+			],
+			[
+				"filter",
+				"filterCloud"
+			],
+			[
+				"fi",
+				"filter_x"
+			],
+			[
+				"PA",
+				"PARAM_FILTER_X_DEFAULT"
+			],
+			[
+				"PARAM_F",
+				"PARAM_FILTER_X_NAME"
+			],
+			[
+				"TOPIC",
+				"TOPIC_EXTRACTED_OBJECTS"
+			],
+			[
+				"cloud_f",
+				"cloud_filtered"
+			],
+			[
+				"set",
+				"setInputCloud"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/home/unnar/catkin_ws/src/s8_ip/src/object_recognition.cpp",
+			"settings":
+			{
+				"buffer_size": 14799,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/unnar/PCL/planeSegmentation/planar_segmentation.cpp",
+			"settings":
+			{
+				"buffer_size": 3150,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/unnar/PCL/matrixTransform/matrix_transform.cpp",
+			"settings":
+			{
+				"buffer_size": 7628,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/object_detector.cpp",
+			"settings":
+			{
+				"buffer_size": 11149,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Hello\n\nI am currently signned up for the course Sensor Based Systems (II2302) but wan´t to change that to \nArtificial Neural Networks and other learning Systems (DD2432).\nIs that Possible?\n\nBest regards\nUnnar Þór Axelsson\n900508-T170",
+			"settings":
+			{
+				"buffer_size": 233,
+				"line_ending": "Unix",
+				"name": "Hello"
+			}
+		},
+		{
+			"contents": "<?xml version=\"1.0\"?>\n<package>\n  <name>s8_ip_detection </name>\n  <version>0.0.0</version>\n  <description>Robotics image processing package</description>\n  <maintainer email=\"unnar@kth.se\">unnar</maintainer>\n  <license>BSD</license>\n  <buildtool_depend>catkin</buildtool_depend>\n  <build_depend>sensor_msgs</build_depend>\n  <build_depend>roscpp</build_depend>\n  <run_depend>sensor_msgs</run_depend>\n  <run_depend>roscpp</run_depend>\n  <build_depend>cv_bridge</build_depend>\n  <run_depend>cv_bridge</run_depend>\n  <build_depend>std_msgs</build_depend>\n  <run_depend>std_msgs</run_depend>\n  <build_depend>image_transport</build_depend>\n  <run_depend>image_transport</run_depend>\n  <run_depend>message_runtime</run_depend>\n  <build_depend>libpcl-all-dev</build_depend>\n  <run_depend>libpcl-all</run_depend>\n  <build_depend>pcl_conversions</build_depend>\n  <run_depend>pcl_conversions</run_depend>\n  <run_depend>pcl_ros</run_depend>\n  <build_depend>pcl_ros</build_depend>\n  <run_depend>s8_common_node</run_depend>\n  <build_depend>s8_common_node</build_depend>\n</package>",
+			"file": "package.xml",
+			"file_size": 1065,
+			"file_write_time": 130589132618465310,
+			"settings":
+			{
+				"buffer_size": 1066,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/C++/C++.sublime-build",
+	"command_palette":
+	{
+		"height": 138.0,
+		"selected_items":
+		[
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"comm",
+				"Git: Quick Commit"
+			],
+			[
+				"ad",
+				"Git: Add Current File"
+			],
+			[
+				"add",
+				"Git: Add Current File"
+			],
+			[
+				"co",
+				"Git: Quick Commit"
+			],
+			[
+				"commi",
+				"Git: Quick Commit"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Remove Package"
+			],
+			[
+				"pack",
+				"Package Control: Enable Package"
+			],
+			[
+				"package",
+				"Package Control: Disable Package"
+			],
+			[
+				"packa",
+				"Package Control: Disable Package"
+			],
+			[
+				"bu",
+				"Snippet: Tabular"
+			],
+			[
+				"buil",
+				"Build: Choose Quick Build"
+			],
+			[
+				"build",
+				"Build: Primary Quick Build"
+			],
+			[
+				"clea",
+				"LaTeXing: Clean Temporary Output Dictionary"
+			],
+			[
+				"pac",
+				"Package Control: Remove Package"
+			],
+			[
+				"pa",
+				"Package Control: Enable Package"
+			],
+			[
+				"late",
+				"Preferences: LaTeXing Settings - User"
+			],
+			[
+				"to",
+				"LaTeXTools: Toggle focus (PDF/editor)"
+			],
+			[
+				"toggle",
+				"LaTeXTools: Toggle focus (PDF/editor)"
+			],
+			[
+				"te",
+				"TeX Live Package Manager: Manage Collections"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 153.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/unnar/catkin_ws/src/s8_ip_detection",
+		"/home/unnar/catkin_ws/src/s8_ip_detection/src",
+		"/home/unnar/catkin_ws/src/s8_ip",
+		"/home/unnar/catkin_ws/src/s8_ip/src"
+	],
+	"file_history":
+	[
+		"/home/unnar/Desktop/internet.sh",
+		"/media/Data/Downloads/amc.sh",
+		"/media/Data/Downloads/transmission-postprocess-manual.sh",
+		"/media/Data/fn.amc",
+		"/home/unnar/catkin_ws/src/s8_ip/src/object_tracker.cpp",
+		"/home/unnar/catkin_ws/src/s8_ip_detection/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/s8_ip_detection/s8_ip_detection.sublime-project",
+		"/home/unnar/PCL/correspondence_grouping.cpp",
+		"/home/unnar/PCL/ProjectPoints/plane_inliers.cpp",
+		"/home/unnar/PCL/matrixTransform/matrix_transform.cpp",
+		"/home/unnar/PCL/planeSegmentation/planar_segmentation.cpp",
+		"/home/unnar/PCL/matrixTransform/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/s8_ip/src/object_recognition.cpp",
+		"/home/unnar/PCL/planeSegmentation/CMakeLists.txt",
+		"/home/unnar/PCL/ProjectPoints/sphere_inliers.cpp",
+		"/home/unnar/PCL/ProjectPoints/project_inliers.cpp",
+		"/home/unnar/PCL/CMakeLists.txt",
+		"/home/unnar/PCL/ProjectPoints/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/pcl/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/my_pcl_tutorial/CMakeLists.txt",
+		"/media/Data/Downloads/transmission-postprocess.sh",
+		"/usr/bin/pireboot.sh",
+		"/usr/bin/local/pireboot.sh",
+		"/home/unnar/catkin_ws/src/s8_ip/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/my_pcl_tutorial/src/example.cpp",
+		"/media/Data/Downloads/transmission-postprocess",
+		"/home/unnar/catkin_ws/src/s8_ip/src/image_converter.cpp",
+		"/home/unnar/catkin_ws/src/s8_ip/src/test.cpp",
+		"/etc/samba/smb.conf",
+		"/home/unnar/catkin_ws/src/s8_ip/package.xml",
+		"/home/unnar/catkin_ws/src/s8_ip/src/houghcircle.cpp",
+		"/home/unnar/catkin_ws/src/my_pcl_tutorial/package.xml",
+		"/home/unnar/catkin_ws/src/my_pcl_tutorial/src/example2.cpp",
+		"/home/unnar/Desktop/PID",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/main.tex",
+		"/home/unnar/catkin_ws/src/ras_lab1/ras_lab1_motors/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/ras_lab1/ras_lab1_distance_sensor/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/pcl/cylinder_segmentation.cpp",
+		"/home/unnar/catkin_ws/src/ras_lab1/ras_lab1_launch/CMakeLists.txt",
+		"/home/unnar/catkin_ws/src/pcl/cylinder_segmentation..cpp",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/Final_comments/Final_comments.tex",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/Summary_of_plans/Summary_of_plans.tex",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/Follow_up_of_objectives/Follow_up_of_objectives.tex",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/Attatchments/Attatchments.tex",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/Lessons_learned/Lessons_learned.tex",
+		"/home/unnar/Dropbox/Project Managment/Assignment1/Final Report/FinalReport.sublime-project",
+		"/home/unnar/.config/sublime-text-3/Packages/User/LaTeXTools.sublime-settings",
+		"/home/unnar/.config/sublime-text-3/Packages/LaTeXTools/Default (Linux).sublime-keymap",
+		"/home/unnar/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/unnar/Dropbox/TestLatex/TestLatex.sublime-project",
+		"/home/unnar/Dropbox/TestLatex/test.tex",
+		"/home/unnar/Dropbox/TestLatex/sectioon1/section1.tex",
+		"/home/unnar/.config/sublime-text-3/Packages/User/LaTeXing.sublime-settings",
+		"/home/unnar/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/unnar/.config/sublime-text-3/Packages/LaTeXing/LaTeXing.sublime-settings",
+		"/home/unnar/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/unnar/Dropbox/TestLatex/test.pdf",
+		"/home/unnar/Desktop/texTest/gummi.tex",
+		"/home/unnar/Dropbox/DD2432/Exercise1/d1.tex",
+		"/home/unnar/.config/sublime-text-3/Packages/LaTeXing/LaTeX.sublime-build",
+		"/usr/local/share/texmf/tex/latex/skoli/skoli.sty"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"filtered",
+			"pointT",
+			"XYZ",
+			".\n",
+			"seriesFor",
+			"TV",
+			"because",
+			"copy",
+			"rename",
+			"TV ",
+			"TVSh",
+			"no file",
+			"extract",
+			"extractI",
+			">\n",
+			"();\n",
+			"view",
+			"TV",
+			"TV ",
+			"se",
+			"cout",
+			"range_image",
+			"XYZ",
+			"PARAM_CYL_RAD_MAX_DEFAULT",
+			"obj_",
+			"01",
+			"PLANE_",
+			"plane_",
+			"PLANE_",
+			"obj_",
+			"OBJ_",
+			"j",
+			"XYZ",
+			"coeffMatrix",
+			"try",
+			"nh",
+			"cloud",
+			"coeff",
+			");\n",
+			"coefficients",
+			"setInputNo",
+			"cloud_f",
+			"inliers_plane",
+			"cloud_filter",
+			"io",
+			"refer",
+			"autoco"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"PointT",
+			"rangeImage",
+			"CYL_",
+			"cyl_",
+			"CYL_",
+			"plane_",
+			"PLANE_"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/home/unnar/catkin_ws/src/s8_ip/src/object_recognition.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14799,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12829,
+								12829
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 6954.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/home/unnar/PCL/planeSegmentation/planar_segmentation.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3150,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1227,
+								1227
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 855.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/home/unnar/PCL/matrixTransform/matrix_transform.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7628,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								135,
+								135
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/object_detector.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11149,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3214,
+								3214
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 31.0,
+						"translation.y": 1634.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 233,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								190,
+								190
+							]
+						],
+						"settings":
+						{
+							"auto_name": "Hello",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "package.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1066,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								56,
+								56
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 29.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git-commit":
+	{
+		"height": 124.0
+	},
+	"output.git-push":
+	{
+		"height": 27.0
+	},
+	"output.tlmgr":
+	{
+		"height": 0.0
+	},
+	"project": "s8_ip_detection.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+			[
+				"",
+				"~/Dropbox/TestLatex/FinalReport.sublime-workspace"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 209.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
