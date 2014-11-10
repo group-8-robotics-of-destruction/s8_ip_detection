@@ -16,7 +16,7 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/kdtree/kdtree.h>
-#include <pcl/features/moment_of_inertia_estimation.h>
+//#include <pcl/features/moment_of_inertia_estimation.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/common/transforms.h>
 // OTHER
@@ -119,16 +119,16 @@ private:
 		float angleRad 		= acos(dotproduct/(sqrt(len1)*sqrt(len2)));
 		return M_PI/2-angleRad;
 	}
-
-	void getMoments(pcl::PointCloud<PointT>::Ptr inputCloud, Eigen::Vector3f *mass_center, PointT *min_point, PointT *max_point)
+/*
+    void getMoments(pcl::PointCloud<PointT>::Ptr inputCloud, Eigen::Vector3f *mass_center, PointT *min_point, PointT *max_point)
 	{
 		pcl::MomentOfInertiaEstimation <PointT> feature_extractor;
 		feature_extractor.setInputCloud (inputCloud);
 		feature_extractor.compute ();
 		feature_extractor.getMassCenter (*mass_center);
-		feature_extractor.getAABB (*min_point, *max_point);
+        feature_extractor.getAABB (*min_point, *max_point);
 	}
-
+*/
 	void rotatePointCloud(pcl::PointCloud<PointT>::Ptr inputCloud, pcl::PointCloud<PointT>::Ptr outputCloud, double theta)
 	{
 	    // Create rotation matrix.
@@ -265,20 +265,24 @@ private:
 			cloud_cluster->height = 1;
 			cloud_cluster->is_dense = true;
 			cloud_cluster->header.frame_id = "camera_rgb_frame";
-
+/*
 			PointT min_point_AABB;
 			PointT max_point_AABB;
 			Eigen::Vector3f mass_center;
-			getMoments(cloud_cluster, &mass_center, &min_point_AABB, &max_point_AABB);
+            getMoments(cloud_cluster, &mass_center, &min_point_AABB, &max_point_AABB);
 			double xDiff = max_point_AABB.x - min_point_AABB.x;
 			double yDiff = max_point_AABB.y - min_point_AABB.y;
 			double zDiff = max_point_AABB.z - min_point_AABB.z;
+            */
+            double xDiff=0.05;
+            double yDiff=0.05;
+            double zDiff=0.05;
 			// Force the cluster to be roughly the shape of the object.
 			if (xDiff > 0.01 && xDiff < 0.10 && yDiff > 0.01 && yDiff < 0.10 && zDiff < 0.10)
 			{
-				cout << "x: " << mass_center(0) << " y: " << mass_center(1) << " z: " << mass_center(2) << endl;
+                //cout << "x: " << mass_center(0) << " y: " << mass_center(1) << " z: " << mass_center(2) << endl;
 				cloudPublish(cloud_cluster);
-			}
+            }
 			j++;
 			cout <<"j: " << j << endl;
 		}
