@@ -17,10 +17,12 @@
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/features/moment_of_inertia_estimation.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/common/transforms.h>
 // OTHER
 #include <vector>
+#include <cmath>
 
 
 // DEFINITIONS
@@ -68,6 +70,15 @@ class ObjectDetector : public s8::Node
 
 	bool cloudInitialized;
 
+	struct center_of_mass {
+		double x_width;
+		double y_width;
+		double z_width;
+		double x_center;
+		double y_center;
+		double z_center;
+	};
+
 public:
 	ObjectDetector(int hz) : hz(hz)
 	{
@@ -105,6 +116,16 @@ public:
 	}
 
 private:
+	// Removes outliers using a StatisticalOutlierRemoval filter
+	void statisticalOutlierRemovalCloud(pcl::PointCloud<PointT>::Ptr cloud_stat)
+	{
+		pcl::StatisticalOutlierRemoval<PointT> sta;
+		sta.setInputCloud (cloud_stat);
+		sta.setMeanK (20);
+		sta.setStddevMulThresh (1.0);
+		sta.filter (*cloud_stat);
+	}
+
 	// Calculates the angle between two 3D planes.
     double getAngle (pcl::ModelCoefficients::Ptr coefficients)
 	{
@@ -265,7 +286,7 @@ private:
 			cloud_cluster->height = 1;
 			cloud_cluster->is_dense = true;
 			cloud_cluster->header.frame_id = "camera_rgb_frame";
-
+/*
 			PointT min_point_AABB;
 			PointT max_point_AABB;
 			Eigen::Vector3f mass_center;
@@ -277,12 +298,60 @@ private:
 			if (xDiff > 0.01 && xDiff < 0.10 && yDiff > 0.01 && yDiff < 0.10 && zDiff < 0.10)
 			{
 				cout << "x: " << mass_center(0) << " y: " << mass_center(1) << " z: " << mass_center(2) << endl;
+*/			
+			statisticalOutlierRemovalCloud(cloud_cluster);
+			center_of_mass massCenter;
+			getCloudSize(cloud_cluster, &massCenter);
+			ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
+			if (massCenter.x_width > 0.02 && massCenter.x_width < 0.10 && massCenter.y_width > 0.02 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10)
 				cloudPublish(cloud_cluster);
-			}
+//			}
 			j++;
 			cout <<"j: " << j << endl;
 		}
 
+    }
+
+    void getCloudSize(pcl::PointCloud<PointT>::Ptr cloud_moment, center_of_mass *center)
+    {
+    	int cloud_size = cloud_moment->points.size();
+
+    	double x_min = cloud_moment->points[0].x;
+    	double x_max = cloud_moment->points[0].x;
+    	double y_min = cloud_moment->points[0].y;
+    	double y_max = cloud_moment->points[0].y;
+    	double z_min = cloud_moment->points[0].z;
+    	double z_max = cloud_moment->points[0].z;
+    	double x_avg = 0, y_avg = 0, z_avg = 0;
+
+    	// Loop through all points to find size
+    	for(int iter = 1; iter != cloud_moment->points.size(); ++iter)
+		{
+			double x_tmp = cloud_moment->points[iter].x;
+    		double y_tmp = cloud_moment->points[iter].y;
+    		double z_tmp = cloud_moment->points[iter].z; 
+    		if (x_tmp > x_max)
+    			x_max = x_tmp;
+			if (x_tmp < x_min)
+				x_min = x_tmp;
+			if (y_tmp > y_max)
+    			y_max = y_tmp;
+			if (y_tmp < y_min)
+				y_min = y_tmp;
+			if (z_tmp > z_max)
+    			z_max = z_tmp;
+			if (z_tmp < z_min)
+				z_min = z_tmp;
+			x_avg += x_tmp;
+			y_avg += y_tmp;
+			z_avg += z_tmp;
+		}
+		(*center).x_center = x_avg / cloud_size;
+		(*center).y_center = y_avg / cloud_size;
+		(*center).z_center = z_avg / cloud_size;
+		(*center).x_width = std::abs(x_max - x_min);
+		(*center).y_width = std::abs(y_max - y_min);
+		(*center).z_width = std::abs(z_max - z_min);
     }
 
 	void point_cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
