@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 	pcl_conversions
   	pcl_ros
   	s8_common_node
+    s8_msgs
 )
 
 #add_message_files(FILES
@@ -25,7 +26,7 @@ generate_messages(DEPENDENCIES
 
 catkin_package(
 	DEPENDS
-	CATKIN_DEPENDS message_runtime s8_common_node
+	CATKIN_DEPENDS message_runtime s8_common_node s8_msgs
 )
 include_directories(${catkin_INCLUDE_DIRS})
 

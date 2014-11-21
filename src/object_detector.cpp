@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <s8_common_node/Node.h>
+#include <s8_msgs/DistPose.h>
 // PCL specific includes
 #include <pcl/io/pcd_io.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -32,6 +33,7 @@
 #define NODE_NAME           		"s8_object_detection_node"
 #define TOPIC_POINT_CLOUD   		"/camera/depth_registered/points"
 #define TOPIC_EXTRACTED_OBJECTS		"/s8/detectedObject"
+#define TOPIC_OBJECTS_POS		    "/s8/ip/detection/distPose"
 
 // PARAMETERS
 #define PARAM_FILTER_X_NAME						"filter_x"
@@ -60,6 +62,7 @@ class ObjectDetector : public s8::Node
 
     ros::Subscriber point_cloud_subscriber;
     ros::Publisher point_cloud_publisher;
+    ros::Publisher object_distPos_publisher;
     pcl::PointCloud<PointT>::Ptr cloud;
 
     double filter_x, filter_y, filter_z;
@@ -84,8 +87,9 @@ public:
     {
         add_params();
         //printParams();
-        point_cloud_subscriber = nh.subscribe(TOPIC_POINT_CLOUD, BUFFER_SIZE, &ObjectDetector::point_cloud_callback, this);
-        point_cloud_publisher  = nh.advertise<sensor_msgs::PointCloud2> (TOPIC_EXTRACTED_OBJECTS, BUFFER_SIZE);
+        point_cloud_subscriber  = nh.subscribe(TOPIC_POINT_CLOUD, BUFFER_SIZE, &ObjectDetector::point_cloud_callback, this);
+        point_cloud_publisher   = nh.advertise<sensor_msgs::PointCloud2> (TOPIC_EXTRACTED_OBJECTS, BUFFER_SIZE);
+        object_distPos_publisher= nh.advertise<s8_msgs::DistPose> (TOPIC_OBJECTS_POS, BUFFER_SIZE);
 
         cloud = pcl::PointCloud<PointT>::Ptr (new pcl::PointCloud<PointT>);
         cloudInitialized = false;
@@ -305,6 +309,7 @@ private:
             ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
             if (massCenter.x_width > 0.02 && massCenter.x_width < 0.10 && massCenter.y_width > 0.02 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10)
                 cloudPublish(cloud_cluster);
+                distPosePublish(massCenter.x_center, massCenter.z_center);
 //			}
             j++;
             cout <<"j: " << j << endl;
@@ -365,6 +370,17 @@ private:
         sensor_msgs::PointCloud2 output;
         pcl::toROSMsg(*cloud_pub, output);
         point_cloud_publisher.publish (output);
+    }
+
+    void distPosePublish(double x, double z)
+    {
+        s8_msgs::DistPose distPose;
+        double theta = std::atan(x/z);
+        double dist  = std::sqrt(x*x+z*z);
+
+        distPose.pose = (float)theta;
+        distPose.dist = (float)dist;
+        object_distPos_publisher.publish(distPose);
     }
 
     void add_params()
