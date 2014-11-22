@@ -17,7 +17,7 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/kdtree/kdtree.h>
-#include <pcl/features/moment_of_inertia_estimation.h>
+//#include <pcl/features/moment_of_inertia_estimation.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/common/transforms.h>
@@ -145,14 +145,14 @@ private:
         return M_PI/2-angleRad;
     }
 
-    void getMoments(pcl::PointCloud<PointT>::Ptr inputCloud, Eigen::Vector3f *mass_center, PointT *min_point, PointT *max_point)
-    {
-        pcl::MomentOfInertiaEstimation <PointT> feature_extractor;
-        feature_extractor.setInputCloud (inputCloud);
-        feature_extractor.compute ();
-        feature_extractor.getMassCenter (*mass_center);
-        feature_extractor.getAABB (*min_point, *max_point);
-    }
+    // void getMoments(pcl::PointCloud<PointT>::Ptr inputCloud, Eigen::Vector3f *mass_center, PointT *min_point, PointT *max_point)
+    // {
+    //     pcl::MomentOfInertiaEstimation <PointT> feature_extractor;
+    //     feature_extractor.setInputCloud (inputCloud);
+    //     feature_extractor.compute ();
+    //     feature_extractor.getMassCenter (*mass_center);
+    //     feature_extractor.getAABB (*min_point, *max_point);
+    // }
 
     void rotatePointCloud(pcl::PointCloud<PointT>::Ptr inputCloud, pcl::PointCloud<PointT>::Ptr outputCloud, double theta)
     {
