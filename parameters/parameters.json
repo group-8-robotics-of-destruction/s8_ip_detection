@@ -1,0 +1,16 @@
+// Configuration options
+{
+    // PassThrough Filter
+    "filter_x"                  :   "0.1",
+    "filter_y"                  :   "0.2",
+    "filter_z"                  :   "1.0",
+    // Floor remover
+    "floor_extraction_dist"     :   "0.02",
+    // Voxel grid filter
+    "voxel_leaf_size"           :   "0.005", 
+    // Plane Segmentation
+    "seg_distance"              :   "0.01",
+    "seg_percentage"            :   "0.2",
+    // Camera Angle
+    "cam_angle"                 :   "0.4"
+}

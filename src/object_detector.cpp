@@ -22,6 +22,9 @@
 #include <pcl/ModelCoefficients.h>
 #include <pcl/common/transforms.h>
 // OTHER
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 #include <vector>
 #include <cmath>
 
@@ -34,6 +37,7 @@
 #define TOPIC_POINT_CLOUD   		"/camera/depth_registered/points"
 #define TOPIC_EXTRACTED_OBJECTS		"/s8/detectedObject"
 #define TOPIC_OBJECTS_POS		    "/s8/ip/detection/distPose"
+#define CONFIG_DOC                  "/catkin_ws/src/s8_object_aligner/parameters/parameters.json"
 
 // PARAMETERS
 #define PARAM_FILTER_X_NAME						"filter_x"
@@ -227,20 +231,34 @@ private:
         pcl::ModelCoefficients::Ptr coeff (new pcl::ModelCoefficients);
         pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 
-        pcl::SACSegmentation<PointT> seg;
+        pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
+        pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT> ());
+        pcl::NormalEstimation<PointT, pcl::Normal> ne;
+
+        pcl::SACSegmentationFromNormals<PointT, pcl::Normal> seg;
         pcl::ExtractIndices<PointT> extract;
 
+        // Estimate point normals
+        ne.setSearchMethod (tree);
+        ne.setKSearch (50);
+
         seg.setOptimizeCoefficients (true);
-        seg.setModelType (pcl::SACMODEL_PLANE);
+        seg.setModelType (pcl::SACMODEL_NORMAL_PLANE);
         seg.setMethodType (pcl::SAC_RANSAC);
         seg.setDistanceThreshold (seg_distance);
+        seg.setNormalDistanceWeight (0.1);
+        seg.setMaxIterations (1000);
 
         int i = 0, nr_points = (int) cloud_seg->points.size ();
         // While 20% of the original cloud is still there
         while (cloud_seg->points.size () > seg_percentage * nr_points && i < 10)
         {
             //seg.setInputCloud (cloud);
+            ne.setInputCloud (cloud_seg);
+            ne.compute (*cloud_normals);
+            //seg.setInputCloud (cloud);
             seg.setInputCloud (cloud_seg);
+            seg.setInputNormals (cloud_normals);
             seg.segment (*inliers, *coeff);
             if (inliers->indices.size () == 0)
             {
@@ -290,27 +308,16 @@ private:
             cloud_cluster->height = 1;
             cloud_cluster->is_dense = true;
             cloud_cluster->header.frame_id = "camera_rgb_frame";
-/*
-            PointT min_point_AABB;
-            PointT max_point_AABB;
-            Eigen::Vector3f mass_center;
-            getMoments(cloud_cluster, &mass_center, &min_point_AABB, &max_point_AABB);
-            double xDiff = max_point_AABB.x - min_point_AABB.x;
-            double yDiff = max_point_AABB.y - min_point_AABB.y;
-            double zDiff = max_point_AABB.z - min_point_AABB.z;
-            // Force the cluster to be roughly the shape of the object.
-            if (xDiff > 0.01 && xDiff < 0.10 && yDiff > 0.01 && yDiff < 0.10 && zDiff < 0.10)
-            {
-                cout << "x: " << mass_center(0) << " y: " << mass_center(1) << " z: " << mass_center(2) << endl;
-*/
+
             statisticalOutlierRemovalCloud(cloud_cluster);
             center_of_mass massCenter;
             getCloudSize(cloud_cluster, &massCenter);
             ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
             if (massCenter.x_width > 0.02 && massCenter.x_width < 0.10 && massCenter.y_width > 0.02 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10)
+            {
                 cloudPublish(cloud_cluster);
                 distPosePublish(massCenter.x_center, massCenter.z_center);
-//			}
+			}
             j++;
             cout <<"j: " << j << endl;
         }
@@ -385,19 +392,18 @@ private:
 
     void add_params()
     {
-        // Passthrough filter parameters.
-        add_param(PARAM_FILTER_X_NAME, filter_x, PARAM_FILTER_X_DEFAULT);
-        add_param(PARAM_FILTER_Y_NAME, filter_y, PARAM_FILTER_Y_DEFAULT);
-        add_param(PARAM_FILTER_Z_NAME, filter_z, PARAM_FILTER_Z_DEFAULT);
-        // Voxel filtering parameters
-        add_param(PARAM_VOXEL_LEAF_SIZE_NAME, voxel_leaf_size, PARAM_VOXEL_LEAF_SIZE_DEFAULT);
-        // Floor extraction.
-        add_param(PARAM_FLOOR_EXTRACTION_DIST_NAME, floor_extraction_dist, PARAM_FLOOR_EXTRACTION_DIST_DEFAULT);
-        // Segmentation parameters, remove walls.
-        add_param(PARAM_SEG_DISTANCE_NAME, seg_distance, PARAM_SEG_DISTANCE_DEFAULT);
-        add_param(PARAM_SEG_PERCENTAGE_NAME, seg_percentage, PARAM_SEG_PERCENTAGE_DEFAULT);
-        // Camera angle
-        add_param(PARAM_CAM_ANGLE_NAME, cam_angle, PARAM_CAM_ANGLE_DEFAULT);
+        const char * home = ::getenv("HOME");
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(*home + CONFIG_DOC, pt);
+        // CIRCLE
+        filter_x = pt.get<double>("filter_x");
+        filter_y = pt.get<double>("filter_y");
+        filter_z = pt.get<double>("filter_z");
+        floor_extraction_dist = pt.get<double>("floor_extraction_dist");
+        voxel_leaf_size = pt.get<double>("voxel_leaf_size");
+        seg_distance = pt.get<double>("seg_distance");
+        seg_percentage = pt.get<double>("seg_percentage");
+        cam_angle = pt.get<double>("cam_angle");
     }
 };
 
