@@ -17,6 +17,7 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/kdtree/kdtree.h>
+#include <pcl/surface/mls.h>
 //#include <pcl/features/moment_of_inertia_estimation.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/ModelCoefficients.h>
@@ -25,19 +26,20 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+#include <cstdlib>
 #include <vector>
 #include <cmath>
 
 
 // DEFINITIONS
-#define HZ                  10
+#define HZ                  5
 #define BUFFER_SIZE         1
 
 #define NODE_NAME           		"s8_object_detection_node"
 #define TOPIC_POINT_CLOUD   		"/camera/depth_registered/points"
 #define TOPIC_EXTRACTED_OBJECTS		"/s8/detectedObject"
 #define TOPIC_OBJECTS_POS		    "/s8/ip/detection/distPose"
-#define CONFIG_DOC                  "/catkin_ws/src/s8_object_aligner/parameters/parameters.json"
+#define CONFIG_DOC                  "/catkin_ws/src/s8_ip_detection/parameters/parameters.json"
 
 // PARAMETERS
 #define PARAM_FILTER_X_NAME						"filter_x"
@@ -67,12 +69,13 @@ class ObjectDetector : public s8::Node
     ros::Subscriber point_cloud_subscriber;
     ros::Publisher point_cloud_publisher;
     ros::Publisher object_distPos_publisher;
+    ros::Publisher object_cloudcolor_publisher;
     pcl::PointCloud<PointT>::Ptr cloud;
 
-    double filter_x, filter_y, filter_z;
+    double filter_x, filter_y, filter_z, max_object_height;
     double floor_extraction_dist;
     double	voxel_leaf_size;
-    double 	seg_distance, seg_percentage;
+    double 	seg_distance, seg_percentage, normal_distance_weight;
     double cam_angle;
 
     bool cloudInitialized;
@@ -84,6 +87,9 @@ class ObjectDetector : public s8::Node
         double x_center;
         double y_center;
         double z_center;
+        double x_min, x_max;
+        double y_min, y_max;
+        double z_min, z_max;
     };
 
 public:
@@ -94,7 +100,6 @@ public:
         point_cloud_subscriber  = nh.subscribe(TOPIC_POINT_CLOUD, BUFFER_SIZE, &ObjectDetector::point_cloud_callback, this);
         point_cloud_publisher   = nh.advertise<sensor_msgs::PointCloud2> (TOPIC_EXTRACTED_OBJECTS, BUFFER_SIZE);
         object_distPos_publisher= nh.advertise<s8_msgs::DistPose> (TOPIC_OBJECTS_POS, BUFFER_SIZE);
-
         cloud = pcl::PointCloud<PointT>::Ptr (new pcl::PointCloud<PointT>);
         cloudInitialized = false;
     }
@@ -103,7 +108,10 @@ public:
     {
         if ( cloudInitialized == false)
             return;
+        pcl::PointCloud<PointT>::Ptr cloud_out (new pcl::PointCloud<PointT>);
         passthroughFilterCloud(cloud, 0.3, filter_z, -filter_x, filter_x, -filter_y, 0.4);
+        rotatePointCloud(cloud, cloud, -cam_angle);
+        *cloud_out = *cloud;
         voxelGridCloud(cloud);
         pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
         //extractFloor(cloud, coefficients);
@@ -112,9 +120,8 @@ public:
         //double theta = getAngle(coefficients);
         //cout << "theta: " << theta << endl;
         cloud = removeWallsCloud(cloud);
-        rotatePointCloud(cloud, cloud, -cam_angle);
-        passthroughFilterCloud(cloud, 0.3, filter_z, -filter_x, filter_x, 0.15, 0.40);
-        clusterCloud(cloud);
+        //passthroughFilterCloud(cloud, 0.3, filter_z, -filter_x, filter_x, max_object_height, 0.40);
+        clusterCloud(cloud, cloud_out);
 
         //Eigen::Vector3f mass_center;
         //getMoments(cloud, &mass_center);
@@ -246,7 +253,7 @@ private:
         seg.setModelType (pcl::SACMODEL_NORMAL_PLANE);
         seg.setMethodType (pcl::SAC_RANSAC);
         seg.setDistanceThreshold (seg_distance);
-        seg.setNormalDistanceWeight (0.1);
+        seg.setNormalDistanceWeight (normal_distance_weight);
         seg.setMaxIterations (1000);
 
         int i = 0, nr_points = (int) cloud_seg->points.size ();
@@ -280,7 +287,7 @@ private:
         return cloud_seg;
     }
 
-    void clusterCloud(pcl::PointCloud<PointT>::Ptr cloud_input)
+    void clusterCloud(pcl::PointCloud<PointT>::Ptr cloud_input, pcl::PointCloud<PointT>::Ptr cloud_out)
     {
         // Creating the KdTree object for the search method of the extraction
         pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
@@ -312,12 +319,26 @@ private:
             statisticalOutlierRemovalCloud(cloud_cluster);
             center_of_mass massCenter;
             getCloudSize(cloud_cluster, &massCenter);
-            ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
-            if (massCenter.x_width > 0.02 && massCenter.x_width < 0.10 && massCenter.y_width > 0.02 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10)
+            //ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
+            if (massCenter.x_width > 0.01 && massCenter.x_width < 0.10 && massCenter.y_width > 0.01 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10 && massCenter.y_center > 0.15 )
             {
-                cloudPublish(cloud_cluster);
-                distPosePublish(massCenter.x_center, massCenter.z_center);
+                float H = 0.0, S = 0.0, V = 0.0;
+                getColors(cloud_cluster, &H, &S, &V);
+                if ((H < 0.15 && S < 0.40) || (H > 0.85 && S < 0.1))// && V > 0.65)
+                {
+                    ROS_INFO("Probably a wall");
+                }
+                else
+                {
+                    //passthroughFilterCloud(cloud_out, massCenter.z_min, massCenter.z_max, massCenter.x_min, massCenter.x_max, massCenter.y_min, massCenter.y_max);
+                    cloudPublish(cloud_cluster);
+                    distPosePublish(massCenter.x_center, massCenter.z_center);
+                    break;
+                }
 			}
+            else{
+                ROS_INFO("SIZE INCORRECT");
+            }
             j++;
             cout <<"j: " << j << endl;
         }
@@ -364,7 +385,67 @@ private:
         (*center).x_width = std::abs(x_max - x_min);
         (*center).y_width = std::abs(y_max - y_min);
         (*center).z_width = std::abs(z_max - z_min);
+        (*center).x_min = x_min;
+        (*center).x_max = x_max;
+        (*center).y_min = y_min;
+        (*center).y_max = y_max;
+        (*center).z_min = z_min;
+        (*center).z_max = z_max;
     }
+
+    void getColors(pcl::PointCloud<PointT>::Ptr cloud_color, float *H, float *S, float *V)
+    {
+        double R_avg = 0;
+        double G_avg = 0;
+        double B_avg = 0;
+        double R_acc = 0;
+        double G_acc = 0;
+        double B_acc = 0;
+        float H_acc = 0;
+        float S_acc = 0;
+        float V_acc = 0;
+        for(int iter = 0; iter != cloud_color->points.size(); ++iter)
+        {
+            //Whatever you want to do with the points
+            uint8_t R = cloud_color->points[iter].r;
+            uint8_t G = cloud_color->points[iter].g;
+            uint8_t B = cloud_color->points[iter].b;
+            //ROS_INFO("R:, %d G: %d B: %d iter, %d", R, G, B, iter);
+            R_acc += R;
+            G_acc += G;
+            B_acc += B;
+        }
+        //ROS_INFO("R_low: %d R_high: %d G_low: %d G_high: %d B_low: %d B_high: %d", R_low, R_high, G_low, R_high, B_low, B_high);
+        int size = cloud_color->points.size();
+        R_avg = R_acc / size;
+        G_avg = G_acc / size;
+        B_avg = B_acc / size;
+        RGB2HSV((float)R_avg, (float)G_avg, (float)B_avg, *H, *S, *V);
+        ROS_INFO("H: %f, S: %f, V: %f", *H, *S, *V);
+    }
+
+    static void RGB2HSV(float r, float g, float b, float &h, float &s, float &v)
+    {
+        float K = 0.f;
+
+        if (g < b)
+        {
+            std::swap(g, b);
+            K = -1.f;
+        }
+
+        if (r < g)
+        {
+            std::swap(r, g);
+            K = -2.f / 6.f - K;
+        }
+
+        float chroma = r - std::min(g, b);
+        h = fabs(K + (g - b) / (6.f * chroma + 1e-20f));
+        s = chroma / (r + 1e-20f);
+        v = r/255;
+    }
+
 
     void point_cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     {
@@ -392,17 +473,21 @@ private:
 
     void add_params()
     {
-        const char * home = ::getenv("HOME");
+        std::string home(::getenv("HOME"));
+        ROS_INFO("home: %s", CONFIG_DOC);
         boost::property_tree::ptree pt;
-        boost::property_tree::read_json(*home + CONFIG_DOC, pt);
+        boost::property_tree::read_json(home + CONFIG_DOC, pt);
         // CIRCLE
         filter_x = pt.get<double>("filter_x");
         filter_y = pt.get<double>("filter_y");
         filter_z = pt.get<double>("filter_z");
+        max_object_height = pt.get<double>("max_object_height");
         floor_extraction_dist = pt.get<double>("floor_extraction_dist");
         voxel_leaf_size = pt.get<double>("voxel_leaf_size");
         seg_distance = pt.get<double>("seg_distance");
         seg_percentage = pt.get<double>("seg_percentage");
+        normal_distance_weight = pt.get<double>("normal_distance_weight");
+
         cam_angle = pt.get<double>("cam_angle");
     }
 };
