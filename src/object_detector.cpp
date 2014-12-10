@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <s8_common_node/Node.h>
 #include <s8_msgs/DistPose.h>
+#include <s8_msgs/isFrontWall.h>
 // PCL specific includes
 #include <pcl/io/pcd_io.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -32,12 +33,13 @@
 
 
 // DEFINITIONS
-#define HZ                  5
+#define HZ                  10
 #define BUFFER_SIZE         1
 
 #define NODE_NAME           		"s8_object_detection_node"
 #define TOPIC_POINT_CLOUD   		"/camera/depth_registered/points"
 #define TOPIC_EXTRACTED_OBJECTS		"/s8/detectedObject"
+#define TOPIC_IS_FRONT_WALL         "/s8/isFrontWall"
 #define TOPIC_OBJECTS_POS		    "/s8/ip/detection/distPose"
 #define CONFIG_DOC                  "/catkin_ws/src/s8_ip_detection/parameters/parameters.json"
 
@@ -69,6 +71,7 @@ class ObjectDetector : public s8::Node
     ros::Subscriber point_cloud_subscriber;
     ros::Publisher point_cloud_publisher;
     ros::Publisher object_distPos_publisher;
+    ros::Publisher isFrontWall_publisher;
     ros::Publisher object_cloudcolor_publisher;
     pcl::PointCloud<PointT>::Ptr cloud;
 
@@ -77,6 +80,15 @@ class ObjectDetector : public s8::Node
     double	voxel_leaf_size;
     double 	seg_distance, seg_percentage, normal_distance_weight;
     double cam_angle;
+
+    double H_floor_high;
+    double H_floor_low;
+    double S_floor_high;
+    double S_floor_low;
+    double H_wall_high;
+    double H_wall_low ;
+    double S_wall_high;
+    double S_wall_low;
 
     bool cloudInitialized;
 
@@ -97,9 +109,10 @@ public:
     {
         add_params();
         //printParams();
-        point_cloud_subscriber  = nh.subscribe(TOPIC_POINT_CLOUD, BUFFER_SIZE, &ObjectDetector::point_cloud_callback, this);
-        point_cloud_publisher   = nh.advertise<sensor_msgs::PointCloud2> (TOPIC_EXTRACTED_OBJECTS, BUFFER_SIZE);
-        object_distPos_publisher= nh.advertise<s8_msgs::DistPose> (TOPIC_OBJECTS_POS, BUFFER_SIZE);
+        point_cloud_subscriber   = nh.subscribe(TOPIC_POINT_CLOUD, BUFFER_SIZE, &ObjectDetector::point_cloud_callback, this);
+        point_cloud_publisher    = nh.advertise<sensor_msgs::PointCloud2> (TOPIC_EXTRACTED_OBJECTS, BUFFER_SIZE);
+        isFrontWall_publisher    = nh.advertise<s8_msgs::isFrontWall> (TOPIC_IS_FRONT_WALL, BUFFER_SIZE);
+        object_distPos_publisher = nh.advertise<s8_msgs::DistPose> (TOPIC_OBJECTS_POS, BUFFER_SIZE);
         cloud = pcl::PointCloud<PointT>::Ptr (new pcl::PointCloud<PointT>);
         cloudInitialized = false;
     }
@@ -121,7 +134,8 @@ public:
         //cout << "theta: " << theta << endl;
         cloud = removeWallsCloud(cloud);
         //passthroughFilterCloud(cloud, 0.3, filter_z, -filter_x, filter_x, max_object_height, 0.40);
-        clusterCloud(cloud, cloud_out);
+        if (cloud->points.size() != 0)
+            clusterCloud(cloud, cloud_out);
 
         //Eigen::Vector3f mass_center;
         //getMoments(cloud, &mass_center);
@@ -154,6 +168,27 @@ private:
         float len2 			= q0*q0+q1*q1+q2*q2;
         float angleRad 		= acos(dotproduct/(sqrt(len1)*sqrt(len2)));
         return M_PI/2-angleRad;
+    }
+
+    bool getAngleToWall(pcl::ModelCoefficients::Ptr coefficients)
+    {
+
+        double qx = coefficients->values[0];
+        double qy = coefficients->values[1];
+        double qz = coefficients->values[2];
+
+        double wx = 1;
+        double wy = 1;
+        double wz = 0;
+
+        double length = std::abs(qx*wx + qy*wy);
+        double q_euclidean = std::sqrt(qx*qx + qy*qy + qz*qz);
+        double w_euclidean = std::sqrt(2); 
+        double angle = std::acos(length / (q_euclidean * w_euclidean));
+        //ROS_INFO("angle %lf", angle);
+
+
+        return (std::abs(angle)-1.56 <= 0.2 && std::abs(angle)-1.56 >= -0.2);
     }
 
     // void getMoments(pcl::PointCloud<PointT>::Ptr inputCloud, Eigen::Vector3f *mass_center, PointT *min_point, PointT *max_point)
@@ -258,8 +293,9 @@ private:
 
         int i = 0, nr_points = (int) cloud_seg->points.size ();
         // While 20% of the original cloud is still there
-        while (cloud_seg->points.size () > seg_percentage * nr_points && i < 10)
+        while (cloud_seg->points.size () > seg_percentage * nr_points && i < 10 && cloud_seg->points.size() > 0)
         {
+            ROS_INFO("IN THE WHILE");
             //seg.setInputCloud (cloud);
             ne.setInputCloud (cloud_seg);
             ne.compute (*cloud_normals);
@@ -267,20 +303,22 @@ private:
             seg.setInputCloud (cloud_seg);
             seg.setInputNormals (cloud_normals);
             seg.segment (*inliers, *coeff);
+            ROS_INFO("GOT INLIERS AND COEFFICIENTS");
             if (inliers->indices.size () == 0)
             {
                 break;
             }
-            if(inliers->indices.size() < nr_points/20){
+            if(inliers->indices.size() < nr_points/20 || inliers->indices.size() < 10){
                 i++;
-
                 continue;
             }
             // Extract the planar inliers from the input cloud
+            ROS_INFO("TRYING TO EXTRACT");
             extract.setInputCloud (cloud_seg);
             extract.setIndices (inliers);
             extract.setNegative (true);
             extract.filter (*cloud_plane);
+            ROS_INFO("FILTERED THE CLOUD");
             cloud_seg.swap (cloud_plane);
             i++;
         }
@@ -289,6 +327,9 @@ private:
 
     void clusterCloud(pcl::PointCloud<PointT>::Ptr cloud_input, pcl::PointCloud<PointT>::Ptr cloud_out)
     {
+
+        bool isWall = false;
+        double wallDistance = 0.0;
         // Creating the KdTree object for the search method of the extraction
         pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
         tree->setInputCloud (cloud_input);
@@ -320,11 +361,12 @@ private:
             center_of_mass massCenter;
             getCloudSize(cloud_cluster, &massCenter);
             //ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
-            if (massCenter.x_width > 0.01 && massCenter.x_width < 0.10 && massCenter.y_width > 0.01 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10 && massCenter.y_center > 0.15 )
+            if(massCenter.x_width > 0.01 && massCenter.x_width < 0.10 && massCenter.y_width > 0.01 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10)// && massCenter.y_center > 0.15 )
             {
                 float H = 0.0, S = 0.0, V = 0.0;
                 getColors(cloud_cluster, &H, &S, &V);
-                if ((H < 0.15 && S < 0.40) || (H > 0.85 && S < 0.1))// && V > 0.65)
+                ROS_INFO("H: %lf, S: %lf, V: %lf", H, S, V);
+                if (H < 0.18 && H > 0.08 && S < 0.45)
                 {
                     ROS_INFO("Probably a wall");
                 }
@@ -336,11 +378,16 @@ private:
                     break;
                 }
 			}
+            else if(massCenter.y_width > 0.10 && massCenter.z_width < 0.04 && massCenter.x_center > -0.11 && massCenter.x_center < 0.13 && massCenter.z_center < 0.40){
+                ROS_INFO("PROBABLY A WALL IN FRONT, x size %lf", massCenter.x_width);
+                isWall = true;
+                wallDistance = massCenter.z_center;
+            }
             else{
                 ROS_INFO("SIZE INCORRECT");
             }
             j++;
-            cout <<"j: " << j << endl;
+            wallPublish(isWall, wallDistance);
         }
 
     }
@@ -471,6 +518,14 @@ private:
         object_distPos_publisher.publish(distPose);
     }
 
+    void wallPublish(bool isWall, double distance){
+        s8_msgs::isFrontWall frontWall;
+        frontWall.isFrontWall = isWall;
+        frontWall.distToFrontWall = distance;
+
+        isFrontWall_publisher.publish(frontWall);
+    }
+
     void add_params()
     {
         std::string home(::getenv("HOME"));
@@ -487,6 +542,15 @@ private:
         seg_distance = pt.get<double>("seg_distance");
         seg_percentage = pt.get<double>("seg_percentage");
         normal_distance_weight = pt.get<double>("normal_distance_weight");
+
+        H_floor_high = pt.get<double>("H_floor_high");
+        H_floor_low = pt.get<double>("H_floor_low");
+        S_floor_high = pt.get<double>("S_floor_high");
+        S_floor_low = pt.get<double>("S_floor_low");
+        H_wall_high = pt.get<double>("H_wall_high");
+        H_wall_low  = pt.get<double>("H_wall_low");
+        S_wall_high = pt.get<double>("S_wall_high");
+        S_wall_low = pt.get<double>("S_wall_low");
 
         cam_angle = pt.get<double>("cam_angle");
     }
