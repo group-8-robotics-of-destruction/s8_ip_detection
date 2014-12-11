@@ -295,7 +295,6 @@ private:
         // While 20% of the original cloud is still there
         while (cloud_seg->points.size () > seg_percentage * nr_points && i < 10 && cloud_seg->points.size() > 0)
         {
-            ROS_INFO("IN THE WHILE");
             //seg.setInputCloud (cloud);
             ne.setInputCloud (cloud_seg);
             ne.compute (*cloud_normals);
@@ -303,7 +302,6 @@ private:
             seg.setInputCloud (cloud_seg);
             seg.setInputNormals (cloud_normals);
             seg.segment (*inliers, *coeff);
-            ROS_INFO("GOT INLIERS AND COEFFICIENTS");
             if (inliers->indices.size () == 0)
             {
                 break;
@@ -313,12 +311,10 @@ private:
                 continue;
             }
             // Extract the planar inliers from the input cloud
-            ROS_INFO("TRYING TO EXTRACT");
             extract.setInputCloud (cloud_seg);
             extract.setIndices (inliers);
             extract.setNegative (true);
             extract.filter (*cloud_plane);
-            ROS_INFO("FILTERED THE CLOUD");
             cloud_seg.swap (cloud_plane);
             i++;
         }
@@ -361,14 +357,14 @@ private:
             center_of_mass massCenter;
             getCloudSize(cloud_cluster, &massCenter);
             //ROS_INFO("X Width: %lf, Z Width: %lf, Z Width: %lf, Center of Mass: %lf", massCenter.x_width, massCenter.y_width, massCenter.z_width, massCenter.z_center);
-            if(massCenter.x_width > 0.01 && massCenter.x_width < 0.10 && massCenter.y_width > 0.01 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10)// && massCenter.y_center > 0.15 )
+            if(massCenter.x_width > 0.01 && massCenter.x_width < 0.10 && massCenter.y_width > 0.01 && massCenter.y_width < 0.10 && massCenter.z_width < 0.10 && massCenter.y_center > 0.15 && massCenter.y_center < 0.3 && massCenter.x_max > -0.13 && massCenter.x_min < 0.15)
             {
                 float H = 0.0, S = 0.0, V = 0.0;
                 getColors(cloud_cluster, &H, &S, &V);
                 ROS_INFO("H: %lf, S: %lf, V: %lf", H, S, V);
-                if (H < 0.18 && H > 0.08 && S < 0.45)
+                if ((H < 0.18 && H > 0.08 && S < 0.45) || (H > 0.6 && S < 0.1))
                 {
-                    ROS_INFO("Probably a wall");
+                    //ROS_INFO("Probably a wall");
                 }
                 else
                 {
@@ -378,13 +374,13 @@ private:
                     break;
                 }
 			}
-            else if(massCenter.y_width > 0.10 && massCenter.z_width < 0.04 && massCenter.x_center > -0.11 && massCenter.x_center < 0.13 && massCenter.z_center < 0.40){
+            else if(massCenter.y_width > 0.15 && massCenter.y_center < 0.15 && massCenter.z_width < 0.04 && massCenter.x_center > -0.11 && massCenter.x_center < 0.13 && massCenter.z_center < 0.35 && massCenter.x_width < 0.06){
                 ROS_INFO("PROBABLY A WALL IN FRONT, x size %lf", massCenter.x_width);
                 isWall = true;
                 wallDistance = massCenter.z_center;
             }
             else{
-                ROS_INFO("SIZE INCORRECT");
+                //ROS_INFO("SIZE INCORRECT");
             }
             j++;
             wallPublish(isWall, wallDistance);

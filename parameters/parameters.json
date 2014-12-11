@@ -10,7 +10,7 @@
     // Voxel grid filter
     "voxel_leaf_size"           :   "0.005", 
     // Plane Segmentation
-    "seg_distance"              :   "0.02",
+    "seg_distance"              :   "0.03",
     "seg_percentage"            :   "0.2",
     "normal_distance_weight"    :   "0.03",
     // Camera Angle
